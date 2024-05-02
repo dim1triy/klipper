@@ -46,23 +46,15 @@ class ScrewsTiltAdjust:
                                     self.cmd_SCREWS_TILT_CALCULATE,
                                     desc=self.cmd_SCREWS_TILT_CALCULATE_help)
 
-    def check_config(self, gcmd):
-        """Check configs."""
+    def check_positions(self, gcmd):
+        """Check positions before start."""
 
         probe = self.printer.lookup_object('probe', None)
         if probe is not None:
             x_offset, y_offset = probe.get_offsets()[:2]
 
-        x_config = self.config.getsection('stepper_x')
-        y_config = self.config.getsection('stepper_y')
-        x_position_min = x_config.getfloat('position_min', default=0)
-        x_position_max = x_config.getfloat('position_max', default=0)
-        y_position_min = y_config.getfloat('position_min', default=0)
-        y_position_max = y_config.getfloat('position_max', default=0)
-
-        TEMPLATE_ERROR = \
-            "{name}. {axis} not valid. " \
-            "{type} avaliable: {position_min}, current: {curr_val}"
+        x_min, x_max = self.probe_helper.get_x_min_max()
+        y_min, y_max = self.probe_helper.get_y_min_max()
 
         errors = []
         for point, name in self.screws:
@@ -72,45 +64,27 @@ class ScrewsTiltAdjust:
                 x -= x_offset
                 y -= y_offset
 
-            if x < x_position_min:
-                errors.append(
-                    TEMPLATE_ERROR.format(
-                        name=name, axis='X', type='Min',
-                        position_min=x_position_min, curr_val=x
-                    )
+            self.probe_helper.check_position_value(
+                errors, name + '. X:', x, x_min, x_max, x_offset
                 )
-            elif x > x_position_max:
-                errors.append(
-                    TEMPLATE_ERROR.format(
-                        name=name, axis='X', type='Max',
-                        position_min=x_position_max, curr_val=x
-                    )
-                )
-
-            if y < y_position_min:
-                errors.append(
-                    TEMPLATE_ERROR.format(
-                        name=name, axis='Y', type='Min',
-                        position_min=y_position_min, curr_val=y
-                    )
-                )
-            elif y > y_position_max:
-                errors.append(
-                    TEMPLATE_ERROR.format(
-                        name=name, axis='Y', type='Max',
-                        position_min=y_position_max, curr_val=y
-                    )
+            self.probe_helper.check_position_value(
+                errors, name + '. Y:', y, y_min, y_max, y_offset
                 )
 
         if errors:
-            raise gcmd.error("screws_tilt_adjust: " + '; '.join(errors))
+            if self.probe_helper.use_offsets:
+                gcmd.respond_info('Probe offsets: X:%s, Y:%s' %
+                                  (x_offset, y_offset))
+
+            gcmd.respond_info('\n'.join(errors))
+            raise gcmd.error("Error on screws_tilt_adjust.")
 
     cmd_SCREWS_TILT_CALCULATE_help = "Tool to help adjust bed leveling " \
                                      "screws by calculating the number " \
                                      "of turns to level it."
-
+    
     def cmd_SCREWS_TILT_CALCULATE(self, gcmd):
-        self.check_config(gcmd)
+        self.check_positions(gcmd)
         self.max_diff = gcmd.get_float("MAX_DEVIATION", None)
         # Option to force all turns to be in the given direction (CW or CCW)
         direction = gcmd.get("DIRECTION", default=None)
