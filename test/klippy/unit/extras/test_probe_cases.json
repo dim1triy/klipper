@@ -1,0 +1,113 @@
+[
+    {
+        "use_offsets": false,
+        "kwargs": {
+            "name": ">>>pos < pos_min<<<",
+            "pos": -20,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": 0
+        },
+        "result": [
+            ">>>pos < pos_min<<< not valid. Current: -20. You should use value between 0 and 120."
+        ]
+    },
+    {
+        "use_offsets": false,
+        "kwargs": {
+            "name": ">>>pos > pos_max<<<",
+            "pos": 160,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": 0
+        },
+        "result": [
+            ">>>pos > pos_max<<< not valid. Current: 160. You should use value between 0 and 120."
+        ]
+    },
+    {
+        "use_offsets": false,
+        "kwargs": {
+            "name": ">>>pos is ok<<<",
+            "pos": 60,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": 0
+        },
+        "result": []
+    },
+    {
+        "use_offsets": true,
+        "kwargs": {
+            "name": ">>>offset-. pos < pos_min (1-21=-20)<<<",
+            "pos": -20,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": -21
+        },
+        "result": [
+            ">>>offset-. pos < pos_min (1-21=-20)<<< not valid. Current: -20. You should use value between 21 and 120."
+        ]
+    },
+    {
+        "use_offsets": true,
+        "kwargs": {
+            "name": ">>>offset-. pos > pos_max (160-21=139)<<<",
+            "pos": 139,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": -21
+        },
+        "result": [
+            ">>>offset-. pos > pos_max (160-21=139)<<< not valid. Current: 139. You should use value between 21 and 120."
+        ]
+    },
+    {
+        "use_offsets": true,
+        "kwargs": {
+            "name": ">>>offset-. pos is ok (31-21=10)<<<",
+            "pos": 10,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": -21
+        },
+        "result": []
+    },
+    {
+        "use_offsets": true,
+        "kwargs": {
+            "name": ">>>offset+. pos < pos_min (-35+15=-20)<<<",
+            "pos": -20,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": 15
+        },
+        "result": [
+            ">>>offset+. pos < pos_min (-35+15=-20)<<< not valid. Current: -20. You should use value between 0 and 105."
+        ]
+    },
+    {
+        "use_offsets": true,
+        "kwargs": {
+            "name": ">>>offset+. pos > pos_max (160-15=145)<<<",
+            "pos": 145,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": 15
+        },
+        "result": [
+            ">>>offset+. pos > pos_max (160-15=145)<<< not valid. Current: 145. You should use value between 0 and 105."
+        ]
+    },
+    {
+        "use_offsets": true,
+        "kwargs": {
+            "name": ">>>offset+. pos is ok (10+15=25)<<<",
+            "pos": 25,
+            "pos_min": 0,
+            "pos_max": 120,
+            "offset": 15
+        },
+        "result": []
+    }
+]
