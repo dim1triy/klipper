@@ -60,10 +60,6 @@ class ScrewsTiltAdjust:
         for point, name in self.screws:
             x, y = point
 
-            if self.probe_helper.use_offsets:
-                x -= x_offset
-                y -= y_offset
-
             self.probe_helper.check_position_value(
                 errors, name + '. X:', x, x_min, x_max, x_offset
                 )

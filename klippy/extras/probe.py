@@ -483,9 +483,6 @@ class ProbePointsHelper:
         self.lift_speed = probe.get_lift_speed(gcmd)
         self.probe_offsets = probe.get_offsets()
 
-        if self.use_offsets:
-            gcmd.respond_info('Probe offsets: X:%s, Y:%s, Z:%s' % self.probe_offsets)
-
         if self.horizontal_move_z < self.probe_offsets[2]:
             raise gcmd.error("horizontal_move_z can't be less than"
                              " probe's z_offset")
@@ -532,27 +529,40 @@ class ProbePointsHelper:
         TEMPLATE_ERROR = "{name} not valid. Current: {pos}. " \
             "You should use value between {pos_min} and {pos_max}."
 
-        if pos < pos_min or pos > pos_max:
+        TEMPLATE_OFFSET_ERROR = "{name} not valid. Current: {pos}. " \
+            "Offset: {offset}. Offset position: {offset_pos}. " \
+            "You should use value between {pos_min} and {pos_max}."
+
+        offset_pos = pos
+        if self.use_offsets:
+            offset_pos += offset
+
+        if offset_pos < pos_min or offset_pos > pos_max:
             if self.use_offsets:
                 if offset >= 0:
-                    offset_pos_min = pos_min
-                    offset_pos_max = pos_max - abs(offset)
+                    offset_pos_min = pos_min + offset
+                    offset_pos_max = pos_max - offset
                 else:
                     offset_pos_min = pos_min + abs(offset)
                     offset_pos_max = pos_max
 
                 errors.append(
-                    TEMPLATE_ERROR.format(
+                    TEMPLATE_OFFSET_ERROR.format(
                         name=name,
                         pos=pos,
                         pos_min=offset_pos_min,
-                        pos_max=offset_pos_max
+                        pos_max=offset_pos_max,
+                        offset_pos=offset_pos,
+                        offset=offset
                     )
                 )
             else:
                 errors.append(
                     TEMPLATE_ERROR.format(
-                        name=name, pos=pos, pos_min=pos_min, pos_max=pos_max
+                        name=name,
+                        pos=pos,
+                        pos_min=pos_min,
+                        pos_max=pos_max
                     )
                 )
 
